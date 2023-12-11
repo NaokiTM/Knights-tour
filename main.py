@@ -92,5 +92,3 @@ def game(xSize, ySize):
 game(8,8) 
 
 
-
-
