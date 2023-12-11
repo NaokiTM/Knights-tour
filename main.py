@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import threading
 
 def game(xSize, ySize):
   WIDTH, HEIGHT = xSize * 50, ySize * 50 #width and height in pixels, respectively
@@ -13,7 +14,7 @@ def game(xSize, ySize):
       
   boardRows = 8                                                             #defined the board 
   boardCols = 8
-  board = [[0 for y in range(boardCols)] for x in range(boardRows)]
+  chessBoard = [[0 for y in range(boardCols)] for x in range(boardRows)]
  
   startPosX = random.randint(0, 7)                                         #initialises players position as a random place on board
   startPosY = random.randint(0, 7)
@@ -24,15 +25,22 @@ def game(xSize, ySize):
 
 
   def takeInput():
+
     def get_square_clicked(mouse_x, mouse_y):
       row = mouse_y // SQUARE_SIZE
       col = mouse_x // SQUARE_SIZE
       return row, col
   
-    for event in pygame.event.get(): #needed to define what an event class is 
+    for event in pygame.event.get(): 
       if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-        mouse_x, mouse_y = pygame.mouse.get_pos()
+        mouse_x, mouse_y = pygame.mouse.get_pos() 
         clicked_square = get_square_clicked(mouse_x, mouse_y)
+
+        squarePosX, squarePosY = clicked_square
+
+        playerPos[0], playerPos[1] = squarePosX, squarePosY
+
+    
     
      
      
@@ -49,45 +57,67 @@ def game(xSize, ySize):
         possible_move = [x1, y1] #coordinates of possible move 
 
         for moveset in knight_move_coords: #loops through the outer moves from the possible move we are on.
-            
-            x2, y2 = possible_move[0] + moveset[0], possible_move[1] + moveset[1];  #coordinates of the outer move from the initial possible move
 
-            if 0 <= x2 < BOARD_SIZE_X and 0 <= y2 < BOARD_SIZE_Y and playerPos[x2, y2] < 8:  #checks if second possible move is out of bounds
-              possible_moves_count += 1 #adds 1 to the number of outer moves from the initial possible move, and goes on to try another possible move
-
-      board[x1, y1] = possible_moves_count
+          x2, y2 = possible_move[0] + moveset[0], possible_move[1] + moveset[1];  #coordinates of the outer move from the initial possible move
 
 
+          if 0 <= x2 < BOARD_SIZE_X and 0 <= y2 < BOARD_SIZE_Y and playerPos[x2, y2] < 8:  #checks if second possible move is out of bounds
+            possible_moves_count += 1 #adds 1 to the number of outer moves from the initial possible move, and goes on to try another possible move
+
+        chessBoard[x1, y1] = possible_moves_count
+
+   
 
     for event in pygame.event.get():
       if event.type == pygame.QUIT:       
           pygame.quit()
           sys.exit()
-  
      
   def draw_board():  
-    knight_image = pygame.image.load("knight.png") #import image of knight.png
+    knight_image_big = pygame.image.load("knight.png") #import image of knight.png
+    knight_image = pygame.transform.scale(knight_image_big(SQUARE_SIZE, SQUARE_SIZE))
+    font = pygame.font.Font(none, SQUARE_SIZE - 5)
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))    #sets screen as width x height pixels big
     pygame.display.set_caption("Chessboard")         
 
-    for row in range(BOARD_SIZE_X):          
-        for col in range(BOARD_SIZE_Y):         
-            color = WHITE if (row + col) % 2 == 0 else BLACK       #white if even, black if odd
+    for x in range(BOARD_SIZE_X):          
+        for y in range(BOARD_SIZE_Y):         
+            color = WHITE if (x + y) % 2 == 0 else BLACK       #white if even, black if odd
             pygame.draw.rect(
                 screen,
                 color,
-                (row * SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), #works cuz col and row start at 0
-            )   #           x              y             width        height
+                (x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), #works cuz col and row start at 0
+            )   #           x              y             width        
+            
+            if playerPos[0] == x and playerPos[1] == y: #has the if statement to only print the knight where playerPos is.
+              screen.blit(knight_image(x * SQUARE_SIZE, y * SQUARE_SIZE))
+
+            if chessBoard(x, y) <= 0:
+              False
+            elif chessBoard(x, y) > 0:
+              #draw number onto board at coordinates above, becauase its been filtered to only pass through ones with numbers.
+              num = chessBoard(x,y)
+              num_text = str(num)
+
+              render_num = font.render(num_text, True, (0,0,0))
+              screen.blit(render_num, ((x * SQUARE_SIZE) + SQUARE_SIZE / 2, (y * SQUARE_SIZE) + SQUARE_SIZE / 2))
+
+
+
+              
+              
 
     pygame.display.flip() #updates display
 
 
-  while True:   
+  while True:  
     takeInput()
     logic()
     draw_board() 
   
+
+
 
 game(8,8) 
 
