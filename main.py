@@ -5,7 +5,7 @@ import random
 
 
 def game(xSize, ySize):
-  WIDTH, HEIGHT = xSize * 50, ySize * 50 #width and height in pixels, respectively
+  WIDTH, HEIGHT = xSize * 10, ySize * 10 #width and height in pixels, respectively
   BOARD_SIZE_X = xSize   #how many squares wide the board is 
   BOARD_SIZE_Y = ySize   #how many squares tall the board is 
   SQUARE_SIZE = WIDTH // BOARD_SIZE_X #could use HEIGHT // BOARD_SIZE_Y
@@ -22,7 +22,50 @@ def game(xSize, ySize):
   startPosY = random.randint(0, 7)
   playerPos = [startPosX, startPosY]
 
-  pygame.init()                                                     #initialises pygame
+  pygame.init()
+  screen = pygame.display.set_mode((WIDTH, HEIGHT))
+  pygame.display.set_caption("Chessboard")
+
+
+
+
+
+  def takeInput():
+
+
+    def get_square_clicked(mouse_x, mouse_y):
+      row = mouse_y // SQUARE_SIZE
+      col = mouse_x // SQUARE_SIZE
+      return row, col
+    
+
+    for event in pygame.event.get(): import pygame
+import sys
+import random
+
+
+
+def game(xSize, ySize):
+  WIDTH, HEIGHT = xSize * 10, ySize * 10 #width and height in pixels, respectively
+  BOARD_SIZE_X = xSize   #how many squares wide the board is 
+  BOARD_SIZE_Y = ySize   #how many squares tall the board is 
+  SQUARE_SIZE = WIDTH // BOARD_SIZE_X #could use HEIGHT // BOARD_SIZE_Y
+  WHITE = pygame.Color("burlywood1")    #defines white macro
+  BLACK = pygame.Color("chocolate4")    #define black as a macro 
+
+      
+  boardRows = 8                                                             #defined the board 
+  boardCols = 8
+  chessBoard = [[0 for y in range(boardCols)] for x in range(boardRows)]
+
+ 
+  startPosX = random.randint(0, 7)                                         #initialises players position as a random place on board
+  startPosY = random.randint(0, 7)
+  playerPos = [startPosX, startPosY]
+
+  pygame.init()
+  screen = pygame.display.set_mode((WIDTH, HEIGHT))
+  pygame.display.set_caption("Chessboard")
 
 
 
@@ -52,11 +95,6 @@ def game(xSize, ySize):
 
      
   def logic():
-    #detects if the user quit the game when logic is run
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:       
-          pygame.quit()
-          sys.exit()
 
     #gives coordinates of possible moves, and each one contains the number of moves available from that possible move.#
     knight_move_coords = [(-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2)]
@@ -84,11 +122,8 @@ def game(xSize, ySize):
      
   def draw_board():  
     knight_image_big = pygame.image.load("knight.png") #import image of knight.png
-    knight_image = pygame.transform.scale(knight_image_big(SQUARE_SIZE, SQUARE_SIZE))
-    font = pygame.font.Font(none, SQUARE_SIZE - 5)
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))    #sets screen as width x height pixels big
-    pygame.display.set_caption("Chessboard")    
-
+    knight_image = pygame.transform.scale(knight_image_big, (SQUARE_SIZE, SQUARE_SIZE))
+    font = pygame.font.Font(None, SQUARE_SIZE - 5)
 
 
 
@@ -106,14 +141,14 @@ def game(xSize, ySize):
 
             
             if playerPos[0] == x and playerPos[1] == y: #has the if statement to only print the knight where playerPos is.
-              screen.blit(knight_image(x * SQUARE_SIZE, y * SQUARE_SIZE))
+              screen.blit(knight_image, (x * SQUARE_SIZE, y * SQUARE_SIZE))
 
 
             #draw number of possible moves onto screen
-            if chessBoard(x, y) <= 0:
+            if chessBoard[x][y] <= 0:
               keepPrintingScreenHereUntilRestartGame = 0
-            elif chessBoard(x, y) > 0:
-              num = chessBoard(x,y)
+            elif chessBoard[x][y] > 0:
+              num = chessBoard[x][y]
               num_text = str(num)
 
               render_num = font.render(num_text, True, (0,0,0))
@@ -125,13 +160,17 @@ def game(xSize, ySize):
 
 
 
-  while True:  
+  while True: 
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:       
+          pygame.quit()
+          sys.exit() 
     takeInput()
     logic()
     draw_board() 
   
 
 
-game(8,8)
+game(8,8) 
 
 
